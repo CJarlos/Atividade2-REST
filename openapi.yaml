@@ -1,0 +1,104 @@
+
+Aqui fica a documentação técnica da sua API.
+
+```yaml
+openapi: 3.0.0
+info:
+  title: API de Biblioteca Digital
+  version: 1.0.0
+  description: API para gerenciamento de livros, autores e empréstimos.
+
+paths:
+  /livros:
+    get:
+      summary: Lista todos os livros
+      description: Retorna uma lista de livros, com suporte a filtros, ordenação e paginação.
+      parameters:
+        - name: autor
+          in: query
+          description: Filtra livros pelo nome do autor.
+          schema:
+            type: string
+        - name: disponivel
+          in: query
+          description: Filtra por disponibilidade (true/false).
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          description: Número da página.
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          description: Quantidade de itens por página.
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Lista de livros retornada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Livro'
+  /livros/{id}:
+    get:
+      summary: Obtém um livro pelo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalhes do livro.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livro'
+        '404':
+          description: Livro não encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Livro:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        titulo:
+          type: string
+          example: "Clean Architecture"
+        disponivel:
+          type: boolean
+        _links:
+          type: array
+          items:
+            type: object
+            properties:
+              rel:
+                type: string
+              href:
+                type: string
+              method:
+                type: string
+    Error:
+      type: object
+      properties:
+        erro:
+          type: string
+        codigo:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
